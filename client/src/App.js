@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
+import HowItWorks from "./contents/HowItWorks";
+import QuickStart from "./contents/QuickStart";
+
+import { GeistProvider, CssBaseline } from '@geist-ui/react';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GeistProvider>
+      <CssBaseline />
+    <Router>
+      <div className="App">
+        <Navbar />
+        <Routes>
+          <Route exact path="/" element={<HowItWorks />} />
+          <Route exact path="/quick-start" element={<QuickStart />} />
+        </Routes>
+      </div>
+    </Router>
+    </GeistProvider>
   );
 }
 
