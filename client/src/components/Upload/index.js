@@ -1,7 +1,8 @@
-import React, { useEffect, useState, Component } from "react";
+import React, { useEffect, useState, Component, } from "react";
 import Dropzone from "react-dropzone";
-import { Loading } from "@geist-ui/react";
-import UploadService from "../../services/upload-files";
+import { FakeLoading } from './fakeloader';
+
+// import UploadService from "../../services/upload-files";
 
 import "./style.css";
 
@@ -13,7 +14,10 @@ export default class UploadFiles extends Component {
     this.state = {
       selectedFiles: undefined,
       progressInfo: false,
+      progressFinish: false,
+      timeToLeave: Math.floor(Math.random() * 11),
       fileInfos: [],
+      fileData: [],
     };
   }
 
@@ -25,40 +29,55 @@ export default class UploadFiles extends Component {
     // });
   }
 
+  componentDidUpdate() {
+    if (this.props.onChange) {
+      this.props.onChange(this.state);
+    }
+  }
+
   onDrop(files) {
     if (files.length > 0) {
       this.setState({ selectedFiles: files, progressInfo: true });
+    } else {
+      this.setState({ progressInfo: false });
     }
 
-    let jsonOP;
+    let jsonOutput;
 
     for (let i = 0, f; (f = files[i]); i++) {
       let reader = new FileReader();
 
       reader.onload = (function (theFile) {
         return function (e) {
-          console.log("e readAsText = ", e);
-          console.log("e readAsText target = ", e.target);
           try {
-            jsonOP = JSON.parse(e.target.result);
-            console.log(jsonOP);
-          } catch (ex) {
-            alert("ex when trying to parse json = " + ex);
+            jsonOutput = JSON.parse(e.target.result);
+            // TODO: add toast
+            console.log('dosya başarıyla yüklendi')
+            
+          } catch (error) {
+            console.error(`hiçbir şey olmasa bile kesin bir şeyler oldu ${error}`);
           }
         };
       })(f);
       reader.readAsText(f);
     }
+
+    // HEY MR WIZARD, GET ME OUT OF HERE!
+    setTimeout(() => {
+      console.log(jsonOutput);
+      this.setState({ progressFinish: true, fileData: jsonOutput });
+      // this.setState({ fileData: jsonOutput });
+    }, this.state.timeToLeave * 1000);
   }
 
+
+
   render() {
-    const { selectedFiles, progressInfo, fileInfos } = this.state;
-    const timeToLeave = Math.floor(Math.random() * 11);
+    const { selectedFiles, progressInfo, fileInfos } = this.state;  
 
     return (
       <div>
-        {progressInfo && <FakeLoading ttl={timeToLeave} />}
-
+        {progressInfo && <FakeLoading ttl={this.state.timeToLeave} />}
         <div className="my-3">
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps }) => (
@@ -99,32 +118,3 @@ export default class UploadFiles extends Component {
     );
   }
 }
-
-export const FakeLoading = (props) => {
-  let timer;
-  const [count, setCount] = useState(0);
-
-  const TTL = props.ttl;
-
-  const updateCount = () => {
-    timer =
-      !timer &&
-      setInterval(() => {
-        setCount((prevCount) => prevCount + 1);
-      }, 1000);
-
-    if (count === TTL) clearInterval(timer);
-  };
-
-  useEffect(() => {
-    updateCount();
-
-    return () => clearInterval(timer);
-  }, [count]);
-
-  if (count !== TTL) {
-    return <Loading>Dosya yükleniyor</Loading>;
-  } else {
-    return <></>;
-  }
-};
