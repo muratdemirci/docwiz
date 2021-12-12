@@ -23,12 +23,12 @@ class Navbar extends Component {
       <nav>
         <ul>
           <Navitem
-            item="How It Works"
+            item="Nasıl Çalışır?"
             tolink="/"
             activec={this.activeitem}
           ></Navitem>
           <Navitem
-            item="Quick Start"
+            item="Hızlı Başlangıç"
             tolink="/quick-start"
             activec={this.activeitem}
           ></Navitem>

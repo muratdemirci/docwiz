@@ -15,7 +15,8 @@ export default class UploadFiles extends Component {
       selectedFiles: undefined,
       progressInfo: false,
       progressFinish: false,
-      timeToLeave: Math.floor(Math.random() * 11),
+      // timeToLeave: Math.floor(Math.random() * 11),
+      timeToLeave: 1,
       fileInfos: [],
       fileData: [],
     };
@@ -52,7 +53,7 @@ export default class UploadFiles extends Component {
           try {
             jsonOutput = JSON.parse(e.target.result);
             // TODO: add toast
-            console.log('dosya başarıyla yüklendi')
+            // console.log('dosya başarıyla yüklendi')
             
           } catch (error) {
             console.error(`hiçbir şey olmasa bile kesin bir şeyler oldu ${error}`);
@@ -64,7 +65,7 @@ export default class UploadFiles extends Component {
 
     // HEY MR WIZARD, GET ME OUT OF HERE!
     setTimeout(() => {
-      console.log(jsonOutput);
+      // console.log(jsonOutput);
       this.setState({ progressFinish: true, fileData: jsonOutput });
       // this.setState({ fileData: jsonOutput });
     }, this.state.timeToLeave * 1000);
