@@ -1,6 +1,5 @@
 import React from "react";
-import { Text } from "@geist-ui/react";
-import { useTheme } from "@geist-ui/react";
+import { Text, useTheme } from "@geist-ui/react";
 
 import UploadFiles from "../components/Upload";
 
@@ -18,8 +17,6 @@ const QuickStart = () => {
         Quick Start
       </Text>
       <UploadFiles />
-
-      <p> Lorem ipsum</p>
     </div>
   );
 };

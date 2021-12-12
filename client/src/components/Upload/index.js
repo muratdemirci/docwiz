@@ -1,128 +1,63 @@
-import React, { Component } from "react";
+import React, { useEffect, useState, Component } from "react";
 import Dropzone from "react-dropzone";
-
+import { Loading } from "@geist-ui/react";
 import UploadService from "../../services/upload-files";
 
-import './style.css';
+import "./style.css";
 
 export default class UploadFiles extends Component {
   constructor(props) {
     super(props);
-    this.upload = this.upload.bind(this);
-    this.uploadFiles = this.uploadFiles.bind(this);
     this.onDrop = this.onDrop.bind(this);
 
     this.state = {
       selectedFiles: undefined,
-      progressInfos: [],
-      message: [],
+      progressInfo: false,
       fileInfos: [],
     };
   }
 
   componentDidMount() {
-    UploadService.getFiles().then((response) => {
-      this.setState({
-        fileInfos: response.data,
-      });
-    });
-  }
-
-  upload(idx, file) {
-    let _progressInfos = [...this.state.progressInfos];
-
-    UploadService.upload(file, (event) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total
-      );
-      this.setState({
-        _progressInfos,
-      });
-    })
-      .then((response) => {
-        this.setState((prev) => {
-          let nextMessage = [
-            ...prev.message,
-            "Uploaded the file successfully: " + file.name,
-          ];
-          return {
-            message: nextMessage,
-          };
-        });
-
-        return UploadService.getFiles();
-      })
-      .then((files) => {
-        this.setState({
-          fileInfos: files.data,
-        });
-      })
-      .catch(() => {
-        _progressInfos[idx].percentage = 0;
-        this.setState((prev) => {
-          let nextMessage = [
-            ...prev.message,
-            "Could not upload the file: " + file.name,
-          ];
-          return {
-            progressInfos: _progressInfos,
-            message: nextMessage,
-          };
-        });
-      });
-  }
-
-  uploadFiles() {
-    const selectedFiles = this.state.selectedFiles;
-
-    let _progressInfos = [];
-
-    for (let i = 0; i < selectedFiles.length; i++) {
-      _progressInfos.push({ percentage: 0, fileName: selectedFiles[i].name });
-    }
-
-    this.setState(
-      {
-        progressInfos: _progressInfos,
-        message: [],
-      },
-      () => {
-        for (let i = 0; i < selectedFiles.length; i++) {
-          this.upload(i, selectedFiles[i]);
-        }
-      }
-    );
+    // UploadService.getFiles().then((response) => {
+    //   this.setState({
+    //     fileInfos: response.data,
+    //   });
+    // });
   }
 
   onDrop(files) {
     if (files.length > 0) {
-      this.setState({ selectedFiles: files });
+      this.setState({ selectedFiles: files, progressInfo: true });
+    }
+
+    let jsonOP;
+
+    for (let i = 0, f; (f = files[i]); i++) {
+      let reader = new FileReader();
+
+      reader.onload = (function (theFile) {
+        return function (e) {
+          console.log("e readAsText = ", e);
+          console.log("e readAsText target = ", e.target);
+          try {
+            jsonOP = JSON.parse(e.target.result);
+            console.log(jsonOP);
+          } catch (ex) {
+            alert("ex when trying to parse json = " + ex);
+          }
+        };
+      })(f);
+      reader.readAsText(f);
     }
   }
 
   render() {
-    const { selectedFiles, progressInfos, message, fileInfos } = this.state;
+    const { selectedFiles, progressInfo, fileInfos } = this.state;
+    const timeToLeave = Math.floor(Math.random() * 11);
 
     return (
       <div>
-        {progressInfos &&
-          progressInfos.map((progressInfo, index) => (
-            <div className="mb-2" key={index}>
-              <span>{progressInfo.fileName}</span>
-              <div className="progress">
-                <div
-                  className="progress-bar progress-bar-info"
-                  role="progressbar"
-                  aria-valuenow={progressInfo.percentage}
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  style={{ width: progressInfo.percentage + "%" }}
-                >
-                  {progressInfo.percentage}%
-                </div>
-              </div>
-            </div>
-          ))}
+        {progressInfo && <FakeLoading ttl={timeToLeave} />}
 
         <div className="my-3">
           <Dropzone onDrop={this.onDrop}>
@@ -139,32 +74,13 @@ export default class UploadFiles extends Component {
                         : selectedFiles.map((file) => file.name).join(", ")}
                     </div>
                   ) : (
-                    `Drag and drop files here, or click to select files`
+                    "Postman Json dosya çıktınızı sürükleyip bırakabilirsiniz ya da  buraya tıklayıp seçebilirsiniz"
                   )}
                 </div>
-                <aside className="selected-file-wrapper">
-                  <button
-                    className="btn btn-success"
-                    disabled={!selectedFiles}
-                    onClick={this.uploadFiles}
-                  >
-                    Upload
-                  </button>
-                </aside>
               </section>
             )}
           </Dropzone>
         </div>
-
-        {message.length > 0 && (
-          <div className="alert alert-secondary" role="alert">
-            <ul>
-              {message.map((item, i) => {
-                return <li key={i}>{item}</li>;
-              })}
-            </ul>
-          </div>
-        )}
 
         {fileInfos.length > 0 && (
           <div className="card">
@@ -183,3 +99,32 @@ export default class UploadFiles extends Component {
     );
   }
 }
+
+export const FakeLoading = (props) => {
+  let timer;
+  const [count, setCount] = useState(0);
+
+  const TTL = props.ttl;
+
+  const updateCount = () => {
+    timer =
+      !timer &&
+      setInterval(() => {
+        setCount((prevCount) => prevCount + 1);
+      }, 1000);
+
+    if (count === TTL) clearInterval(timer);
+  };
+
+  useEffect(() => {
+    updateCount();
+
+    return () => clearInterval(timer);
+  }, [count]);
+
+  if (count !== TTL) {
+    return <Loading>Dosya yükleniyor</Loading>;
+  } else {
+    return <></>;
+  }
+};
