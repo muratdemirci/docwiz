@@ -11,16 +11,9 @@
   <h3 align="center">Docwiz aka Documentation Wizard</h3>
 
   <p align="center">
-    Docwiz ile rest apilerinizin postman output'ları, readme dosyalarına çevirebilirsiniz.
+    Docwiz ile rest apilerinizin postman output dosyalarını, readme dosyalarına çevirebilirsiniz.
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
-    ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a>
+    Proje Client dosyasında, tamamlanmadı fakat npm install ve npm start ile çalıştırabilirsiniz.
   </p>
 </div>
 
@@ -76,14 +69,9 @@ Use the `BLANK_README.md` to get started.
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
-* [Express](https://expressjs.com/)
-* [Reactstrap](https://reactstrap.github.io/)
-* [MongoDB](https://www.mongodb.com/)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
+* [React](https://reactjs.org/)
+* [Geist](https://react.geist-ui.dev/)
 
 
 <!-- GETTING STARTED -->
