@@ -5,7 +5,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="180" height="180">
+    <img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/logo.png" alt="Logo" width="180" height="180">
   </a>
 
   <h3 align="center">Docwiz aka Documentation Wizard</h3>
@@ -49,7 +49,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<img src="images/docwiz-reklam.jpg" alt="howto" title="howto">
+<img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/docwiz-reklam.jpg" alt="howto" title="howto">
 
 
 
