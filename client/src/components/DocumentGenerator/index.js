@@ -22,12 +22,12 @@ const DocumentGenerator = (props) => {
 
       <Grid.Container gap={2} justify="center">
         <Grid xs={12}>
-          <Card shadow width="100%" height="720px" hoverable>
+          <Card shadow width="100%" style={{ minHeight: '720px' }}  hoverable>
             <TreeViewer data={treeData} />
           </Card>
         </Grid>
         <Grid xs={12}>
-          <Card shadow width="100%" height="720px" hoverable>
+          <Card shadow width="100%" hoverable style={{ minHeight: '720px' }} >
           <ReadmeEditor />
           </Card>
         </Grid>
