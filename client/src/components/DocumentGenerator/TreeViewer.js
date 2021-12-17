@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Text, useTheme, Tree, File, Folder } from "@geist-ui/react";
+import React from "react";
+import { Text, useTheme, Tree } from "@geist-ui/react";
 
 export const TreeViewer = (props) => {
   const handler = (path) => console.log({ text: path });
   const { palette } = useTheme();
 
-  const data = props.data || [];
+  // const data = props.data || [];
 
-  console.log(data);
   return (
     <>
       <Text h3 style={{ color: palette.cyanDark }}>

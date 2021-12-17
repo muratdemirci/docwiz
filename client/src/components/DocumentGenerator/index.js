@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, useTheme, Grid, Card } from "@geist-ui/react";
 
 import { TreeViewer } from './TreeViewer';
@@ -12,7 +12,7 @@ const DocumentGenerator = (props) => {
     if (props.data.progressFinish) {
       setTreeData(props.data.fileData);
     }
-  }, []);
+  }, [ props.data ]);
 
   return (
     <>
