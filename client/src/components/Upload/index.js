@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Component, } from "react";
+import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import { FakeLoading } from './fakeloader';
 
@@ -64,6 +64,7 @@ export default class UploadFiles extends Component {
     }
 
     // HEY MR WIZARD, GET ME OUT OF HERE!
+    // WIZARD: You should stand there and look at the console.
     setTimeout(() => {
       // console.log(jsonOutput);
       this.setState({ progressFinish: true, fileData: jsonOutput });

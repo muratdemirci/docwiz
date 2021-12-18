@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, useTheme, Grid, Card } from "@geist-ui/react";
 
 import { TreeViewer } from './TreeViewer';
@@ -12,7 +12,7 @@ const DocumentGenerator = (props) => {
     if (props.data.progressFinish) {
       setTreeData(props.data.fileData);
     }
-  }, []);
+  }, [ props.data ]);
 
   return (
     <>
@@ -22,12 +22,12 @@ const DocumentGenerator = (props) => {
 
       <Grid.Container gap={2} justify="center">
         <Grid xs={12}>
-          <Card shadow width="100%" height="720px" hoverable>
+          <Card shadow width="100%" style={{ minHeight: '720px' }}  hoverable>
             <TreeViewer data={treeData} />
           </Card>
         </Grid>
         <Grid xs={12}>
-          <Card shadow width="100%" height="720px" hoverable>
+          <Card shadow width="100%" hoverable style={{ minHeight: '720px' }} >
           <ReadmeEditor />
           </Card>
         </Grid>

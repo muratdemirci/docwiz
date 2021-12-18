@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Loading } from "@geist-ui/react";
 
-export const FakeLoading = (props) => {
+export const FakeLoading = props => {
   let timer;
   const [count, setCount] = useState(0);
-
 
   const TTL = props.ttl;
 
@@ -22,7 +21,7 @@ export const FakeLoading = (props) => {
     updateCount();
 
     return () => clearInterval(timer);
-  }, [count]);
+  }, [ timer, count ]);
 
   if (count !== TTL) {
     return <Loading>Dosya yükleniyor</Loading>;
