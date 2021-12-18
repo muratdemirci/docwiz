@@ -6,6 +6,7 @@ export const TreeViewer = (props) => {
   const { palette } = useTheme();
 
   // const data = props.data || [];
+  console.log(props)
 
   return (
     <>
