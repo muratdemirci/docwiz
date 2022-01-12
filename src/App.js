@@ -18,7 +18,6 @@ function App() {
         <Routes>
           <Route exact path="/" element={<HowItWorks />} />
           <Route exact path="/quick-start" element={<QuickStart />} />
-          <Route exact path="/quick-start" element={<QuickStart />} />
           <Route path="*" element={<NotFoundPage />} />
 
         </Routes>
