@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { Text, useTheme, Grid, Card } from "@geist-ui/react";
+import React, { useState, useEffect } from 'react'
+import { Text, useTheme, Grid, Card } from '@geist-ui/react'
 
-import { TreeViewer } from './TreeViewer';
-import { ReadmeEditor } from "./ReadmeEditor";
+import { TreeViewer } from './TreeViewer'
+import { ReadmeEditor } from './ReadmeEditor'
 
 const DocumentGenerator = (props) => {
-  const { palette } = useTheme();
-  const [treeData, setTreeData] = useState([]);
+  const { palette } = useTheme()
+  const [treeData, setTreeData] = useState([])
 
   useEffect(() => {
     if (props.data.progressFinish) {
-      setTreeData(props.data.fileData);
+      setTreeData(props.data.fileData)
     }
-  }, [ props.data ]);
+  }, [props.data])
 
   return (
     <>
@@ -22,18 +22,18 @@ const DocumentGenerator = (props) => {
 
       <Grid.Container gap={2} justify="center">
         <Grid xs={12}>
-          <Card shadow width="100%" style={{ minHeight: '720px' }}  hoverable>
+          <Card shadow width="100%" style={{ minHeight: '720px' }} hoverable>
             <TreeViewer data={treeData} />
           </Card>
         </Grid>
         <Grid xs={12}>
-          <Card shadow width="100%" hoverable style={{ minHeight: '720px' }} >
-          <ReadmeEditor />
+          <Card shadow width="100%" hoverable style={{ minHeight: '720px' }}>
+            <ReadmeEditor />
           </Card>
         </Grid>
       </Grid.Container>
     </>
-  );
-};
+  )
+}
 
-export default DocumentGenerator;
+export default DocumentGenerator

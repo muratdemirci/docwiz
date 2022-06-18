@@ -1,23 +1,23 @@
-import React, { Component } from "react";
-import Navitem from "./NavItem";
+import React, { Component } from 'react'
+import Navitem from './NavItem'
 
 class Navbar extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
-      NavItemActive: "",
-    };
+      NavItemActive: '',
+    }
   }
   activeitem = (x) => {
     if (this.state.NavItemActive.length > 0) {
       document
         .getElementById(this.state.NavItemActive)
-        .classList.remove("active");
+        .classList.remove('active')
     }
     this.setState({ NavItemActive: x }, () => {
-      document.getElementById(this.state.NavItemActive).classList.add("active");
-    });
-  };
+      document.getElementById(this.state.NavItemActive).classList.add('active')
+    })
+  }
   render() {
     return (
       <nav>
@@ -34,8 +34,8 @@ class Navbar extends Component {
           ></Navitem>
         </ul>
       </nav>
-    );
+    )
   }
 }
 
-export default Navbar;
+export default Navbar

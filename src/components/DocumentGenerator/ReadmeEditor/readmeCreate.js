@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react'
 
-import { Input, Select } from "@geist-ui/react";
+import { Input, Select } from '@geist-ui/react'
 
 const RequestList = (props) => {
   return props.requestDetails.map((val, idx) => {
@@ -8,7 +8,7 @@ const RequestList = (props) => {
       lorem = `lorem-${idx}`,
       dateOfPublish = `dateOfPublish-${idx}`,
       type = `type-${idx}`,
-      ipsum = `ipsum-${idx}`;
+      ipsum = `ipsum-${idx}`
     return (
       <div className="form-row" key={val.index}>
         <div className="col">
@@ -32,11 +32,11 @@ const RequestList = (props) => {
           />
         </div>
         <div className="col">
-          <Select placeholder="Request tipini seçiniz"  id={type} data-id={idx}>
-          <Select.Option value="1">POST</Select.Option>
-          <Select.Option value="2">GET</Select.Option>
-          <Select.Option value="3">DELETE</Select.Option>
-          <Select.Option value="4">PUT</Select.Option>
+          <Select placeholder="Request tipini seçiniz" id={type} data-id={idx}>
+            <Select.Option value="1">POST</Select.Option>
+            <Select.Option value="2">GET</Select.Option>
+            <Select.Option value="3">DELETE</Select.Option>
+            <Select.Option value="4">PUT</Select.Option>
           </Select>
         </div>
         <div className="col">
@@ -78,7 +78,7 @@ const RequestList = (props) => {
           )}
         </div>
       </div>
-    );
-  });
-};
-export default RequestList;
+    )
+  })
+}
+export default RequestList
