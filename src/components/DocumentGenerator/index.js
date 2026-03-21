@@ -1,18 +1,28 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Text, useTheme, Grid, Card } from '@geist-ui/react'
 
 import { TreeViewer } from './TreeViewer'
-import { ReadmeEditor } from './ReadmeEditor'
+import { ReadmePanel } from './ReadmePanel'
+import { EndpointDetail } from './EndpointDetail'
+import {
+  generateEndpointReadme,
+  downloadReadme,
+} from '../../utils/readmeGenerator'
 
-const DocumentGenerator = (props) => {
+const DocumentGenerator = ({ collection }) => {
   const { palette } = useTheme()
-  const [treeData, setTreeData] = useState([])
+  const [selectedItem, setSelectedItem] = useState(null)
 
-  useEffect(() => {
-    if (props.data.progressFinish) {
-      setTreeData(props.data.fileData)
-    }
-  }, [props.data])
+  const handleItemSelect = (item) => {
+    setSelectedItem(item)
+  }
+
+  const handleDownloadReadme = useCallback(() => {
+    if (!selectedItem) return
+    const markdown = generateEndpointReadme(selectedItem)
+    const filename = `${selectedItem.name.replace(/[^a-zA-Z0-9]/g, '_')}_README.md`
+    downloadReadme(markdown, filename)
+  }, [selectedItem])
 
   return (
     <>
@@ -23,12 +33,22 @@ const DocumentGenerator = (props) => {
       <Grid.Container gap={2} justify="center">
         <Grid xs={12}>
           <Card shadow width="100%" style={{ minHeight: '720px' }} hoverable>
-            <TreeViewer data={treeData} />
+            <TreeViewer
+              collection={collection}
+              onItemSelect={handleItemSelect}
+            />
           </Card>
         </Grid>
         <Grid xs={12}>
           <Card shadow width="100%" hoverable style={{ minHeight: '720px' }}>
-            <ReadmeEditor />
+            {selectedItem ? (
+              <EndpointDetail
+                item={selectedItem}
+                onDownloadReadme={handleDownloadReadme}
+              />
+            ) : (
+              <ReadmePanel collection={collection} />
+            )}
           </Card>
         </Grid>
       </Grid.Container>

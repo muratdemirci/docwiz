@@ -1,41 +1,29 @@
-import React, { Component } from 'react'
-import Navitem from './NavItem'
+import React from 'react'
+import { useLocation } from 'react-router-dom'
+import NavItem from './NavItem'
 
-class Navbar extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      NavItemActive: '',
-    }
-  }
-  activeitem = (x) => {
-    if (this.state.NavItemActive.length > 0) {
-      document
-        .getElementById(this.state.NavItemActive)
-        .classList.remove('active')
-    }
-    this.setState({ NavItemActive: x }, () => {
-      document.getElementById(this.state.NavItemActive).classList.add('active')
-    })
-  }
-  render() {
-    return (
-      <nav>
-        <ul>
-          <Navitem
-            item="Nasıl Çalışır?"
-            tolink="/"
-            activec={this.activeitem}
-          ></Navitem>
-          <Navitem
-            item="Hızlı Başlangıç"
-            tolink="/quick-start"
-            activec={this.activeitem}
-          ></Navitem>
-        </ul>
-      </nav>
-    )
-  }
+const NAV_ITEMS = [
+  { label: 'Nasıl Çalışır?', to: '/' },
+  { label: 'Hızlı Başlangıç', to: '/quick-start' },
+]
+
+const Navbar = () => {
+  const location = useLocation()
+
+  return (
+    <nav>
+      <ul>
+        {NAV_ITEMS.map((item) => (
+          <NavItem
+            key={item.to}
+            item={item.label}
+            tolink={item.to}
+            isActive={location.pathname === item.to}
+          />
+        ))}
+      </ul>
+    </nav>
+  )
 }
 
 export default Navbar

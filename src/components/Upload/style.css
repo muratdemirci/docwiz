@@ -6,6 +6,18 @@
   color: #bdbdbd;
   cursor: pointer;
   margin-bottom: 20px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  border-radius: 8px;
+}
+
+.dropzone:hover {
+  border-color: #ccc;
+  background-color: #f0f0f0;
+}
+
+.dropzone-active {
+  border-color: #848afc;
+  background-color: #f0f0ff;
 }
 
 .selected-file-wrapper {
@@ -13,6 +25,6 @@
 }
 
 .selected-file {
-  color: #000; 
+  color: #000;
   font-weight: bold;
 }

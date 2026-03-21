@@ -1,137 +1,278 @@
 <div id="top"></div>
 
-
-<!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://github.com/muratdemirci/docwiz">
     <img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/logo.png" alt="Logo" width="180" height="180">
   </a>
 
-  <h3 align="center">Docwiz aka Documentation Wizard</h3>
+  <h3 align="center">DocWiz — Documentation Wizard</h3>
 
   <p align="center">
-    Docwiz ile rest apilerinizin postman output dosyalarını, readme dosyalarına çevirebilirsiniz.
+    Postman collection JSON dosyalarını import edin, endpoint'leri görüntüleyin ve tek tıkla README oluşturun.
     <br />
+    <strong>Frontend-only</strong> — backend gerektirmez, tüm işlemler tarayıcıda yapılır.
   </p>
 </div>
 
+---
 
+## İçindekiler
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+- [Hakkında](#hakkında)
+- [Uygulama Akışı](#uygulama-akışı)
+- [Mimari](#mimari)
+- [Teknolojiler](#teknolojiler)
+- [Kurulum](#kurulum)
+- [Kullanım](#kullanım)
+- [Proje Yapısı](#proje-yapısı)
+- [Test](#test)
+- [Yol Haritası](#yol-haritası)
+- [Katkıda Bulunma](#katkıda-bulunma)
+- [Lisans](#lisans)
+- [İletişim](#iletişim)
 
+---
 
+## Hakkında
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+<img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/docwiz-reklam.jpg" alt="DocWiz Tanıtım" title="DocWiz">
 
-<img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/docwiz-reklam.jpg" alt="howto" title="howto">
+DocWiz, REST API'lerinizin **Postman v2.1 collection export** dosyalarını alıp:
 
+- Endpoint'leri ağaç yapısında görüntüler
+- Seçilen endpoint'in tüm detaylarını gösterir (method, URL, headers, query params, body, responses)
+- Tek tıkla o endpoint için **Markdown README** oluşturur ve indirir
+- Tüm collection için README önizleme ve indirme sunar
 
+Hiçbir backend veya API çağrısı gerektirmez — **tamamen tarayıcıda** çalışır.
 
-### Built With
+---
 
+## Uygulama Akışı
 
-* [React](https://reactjs.org/)
-* [Geist](https://react.geist-ui.dev/)
+```mermaid
+flowchart LR
+    A[Postman JSON\nDosyası] -->|Sürükle & Bırak| B[Upload\nKomponenti]
+    B -->|Validasyon &\nParse| C{Geçerli mi?}
+    C -->|Hayır| D[Hata Mesajı]
+    C -->|Evet| E[Ağaç Görünümü\n+ README Önizleme]
+    E -->|Endpoint Tıkla| F[Endpoint Detayı]
+    F -->|README Oluştur| G[Markdown\nOluştur & İndir]
+    E -->|README İndir| H[Tüm Collection\nREADME İndir]
+```
 
+---
 
-<!-- GETTING STARTED -->
-## Getting Started
+## Mimari
 
-    Proje Client dosyasında, tamamlanmadı fakat npm install ve npm start ile çalıştırabilirsiniz.
+```mermaid
+graph TD
+    subgraph UI["UI Katmanı (React + Geist UI)"]
+        App[App.js]
+        Nav[Navbar]
+        QS[QuickStart]
+        HW[HowItWorks]
+        UF[UploadFiles]
+        DG[DocumentGenerator]
+        TV[TreeViewer]
+        ED[EndpointDetail]
+        RP[ReadmePanel]
+    end
 
+    subgraph Utils["Utility Katmanı"]
+        PP[postmanParser.js]
+        RG[readmeGenerator.js]
+        FJ[formatJson.js]
+        SN[sanitize.js]
+    end
 
-### Installation
+    App --> Nav
+    App --> QS
+    App --> HW
+    QS --> UF
+    QS --> DG
+    UF -->|JSON Data| PP
+    DG --> TV
+    DG --> ED
+    DG --> RP
+    TV --> PP
+    ED --> FJ
+    ED -->|README Oluştur| RG
+    RP --> RG
+    RP --> SN
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/muratdemirci/docwiz/tree/main/client
-   ```
-2. Install NPM packages
-   ```sh
-   npm install
-   ```
-3. Enter your API in `config.js`
-   ```sh
-   npm start
-   ```
+    style UI fill:#f9f0ff,stroke:#7928ca
+    style Utils fill:#f0f9ff,stroke:#0070f3
+```
 
+### Temel Prensipler
 
+| Prensip | Uygulama |
+|---------|----------|
+| **Single Responsibility** | Her utility tek iş yapar: `postmanParser` parse eder, `readmeGenerator` markdown üretir, `sanitize` XSS temizler |
+| **DRY** | `formatJson`, `KeyValueTable`, `generateTable` gibi paylaşılan modüller tekrarı önler |
+| **Güvenlik** | `DOMPurify` ile HTML sanitization — kullanıcı dosyasından gelen veri asla raw render edilmez |
+| **Frontend-Only** | Sıfır backend bağımlılığı, tüm işlem tarayıcıda |
 
-<!-- ROADMAP -->
-## Roadmap
+---
 
-Version 1.0
-- [x] Postman json output dosyasını ekrana yazdır
-    - [x] Api dökümantasyonları nasıl olur, araştır
-    - [ ] Bir şema belirle, buna göre db'ye kaydedilsin
-    - [ ] api endpointlerinin klasörlenmesi (düşüneyim bunu)
+## Teknolojiler
 
-- [ ] Rest apiye başla
-    - [ ] Dosya upload edecek (belki?)
-    - [ ] Gelen dosya output unu insert endpointi üzerinden veritabanına yazdır
-    - [ ] Endpointler için description alanı
+| Teknoloji | Versiyon | Kullanım |
+|-----------|----------|----------|
+| [React](https://reactjs.org/) | 17.x | UI framework |
+| [Geist UI](https://react.geist-ui.dev/) | 2.x | Component kütüphanesi |
+| [React Router](https://reactrouter.com/) | 6.x | Client-side routing |
+| [react-dropzone](https://react-dropzone.js.org/) | 11.x | Dosya sürükle & bırak |
+| [DOMPurify](https://github.com/cure53/DOMPurify) | 3.x | XSS koruması |
+| [Testing Library](https://testing-library.com/) | — | Test altyapısı |
 
-- [ ] README dosyalarının oluşturulması
-    - [ ] dosya otomatik oluşturulur
-    - [ ] önizlenir
-    - [ ] düzenlenir
-    - [ ] download edilir
+---
 
-yukarıdakilere vakit kalmadığı için olayı UI'da halletmeyi denedim :)
+## Kurulum
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+```bash
+# Repoyu klonlayın
+git clone https://github.com/muratdemirci/docwiz.git
+cd docwiz
 
+# Bağımlılıkları yükleyin
+npm install
 
+# Geliştirme sunucusunu başlatın
+npm start
+```
 
-<!-- CONTRIBUTING -->
-## Contributing
+Uygulama varsayılan olarak `http://localhost:3000` adresinde açılır.
 
-Burası güncellenecek
+---
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+## Kullanım
 
+```mermaid
+sequenceDiagram
+    actor K as Kullanıcı
+    participant U as Upload
+    participant P as Parser
+    participant T as TreeViewer
+    participant E as EndpointDetail
+    participant R as ReadmeGenerator
 
+    K->>U: JSON dosyasını sürükle & bırak
+    U->>P: JSON parse & validasyon
+    P-->>U: Parsed collection
+    U->>T: Ağaç görünümünü render et
+    K->>T: Endpoint'e tıkla
+    T->>E: Endpoint detayını göster
+    K->>E: "README Oluştur" butonuna tıkla
+    E->>R: Endpoint verisiyle markdown oluştur
+    R-->>K: README.md dosyası indirilir
+```
 
-<!-- LICENSE -->
-## License
+1. **"Hızlı Başlangıç"** sekmesine gidin
+2. Postman collection JSON dosyanızı **sürükleyip bırakın** veya tıklayıp seçin
+3. Sol panelde **ağaç görünümünden** bir endpoint'e tıklayın
+4. Sağ panelde endpoint detaylarını inceleyin
+5. **"README Oluştur"** butonuna tıklayarak o endpoint'in README'sini indirin
+6. Veya hiç endpoint seçmeden **"README İndir"** ile tüm collection README'sini indirin
 
-Distributed under the Apache License Version 2.0. See `LICENSE.txt` for more information.
+> **İpucu:** Proje içinde örnek bir Postman collection dosyası bulunmaktadır: `src/test-data/sample-collection.json`
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+---
 
+## Proje Yapısı
 
+```
+src/
+├── components/
+│   ├── Navbar/                  # Navigasyon (functional, route-based active state)
+│   ├── Upload/                  # Dosya yükleme (dropzone + validasyon)
+│   └── DocumentGenerator/
+│       ├── TreeViewer/          # Postman collection ağaç görünümü
+│       ├── EndpointDetail/      # Seçili endpoint detay paneli
+│       └── ReadmePanel/         # README önizleme + indirme
+├── contents/
+│   ├── HowItWorks.js           # Bilgilendirme sayfası
+│   ├── QuickStart.js           # Ana uygulama sayfası
+│   └── NotFoundPage.js         # 404 sayfası
+├── utils/
+│   ├── postmanParser.js        # Postman v2.1 collection parser
+│   ├── readmeGenerator.js      # Markdown README üretici
+│   ├── formatJson.js           # JSON formatlama utility
+│   └── sanitize.js             # DOMPurify HTML sanitization
+└── test-data/
+    └── sample-collection.json  # Test için örnek Postman collection
+```
 
-<!-- CONTACT -->
-## Contact
+---
 
-Murat demirci- [@deusmur](https://twitter.com/deusmur) - deusmur@protonmail.com
+## Test
 
-Project Link: [https://github.com/muratdemirci/docwiz](https://github.com/muratdemirci/docwiz)
+```bash
+# Tüm testleri çalıştır
+npm test
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+# Verbose çıktı ile
+npx react-scripts test --watchAll=false --verbose
+```
+
+```mermaid
+pie title Test Dağılımı (85 test)
+    "Parser Testleri" : 38
+    "README Generator Testleri" : 17
+    "Sanitize Testleri" : 8
+    "Format JSON Testleri" : 5
+    "Integration Testleri" : 15
+    "App Testleri" : 2
+```
+
+| Test Suite | Kapsam |
+|------------|--------|
+| `postmanParser.test.js` | Validasyon, parse, flatten, edge case'ler |
+| `readmeGenerator.test.js` | Markdown üretimi, TOC, tablo, download |
+| `sanitize.test.js` | XSS koruması, script/iframe/event handler temizleme |
+| `formatJson.test.js` | JSON formatlama, geçersiz input handling |
+| `integration.test.js` | Upload akışı, Navbar, DocumentGenerator, E2E flow |
+
+---
+
+## Yol Haritası
+
+- [x] Postman v2.1 collection import & parse
+- [x] Ağaç görünümünde endpoint listesi
+- [x] Endpoint detay görüntüleme (method, URL, headers, body, responses)
+- [x] Tek endpoint için README oluşturma & indirme
+- [x] Tüm collection için README önizleme & indirme
+- [x] DOMPurify ile XSS koruması
+- [x] 85 test ile kapsamlı test coverage
+- [ ] Birden fazla endpoint seçerek toplu README oluşturma
+- [ ] README şablon özelleştirme
+- [ ] Postman v2.0 collection desteği
+- [ ] Dark mode
+
+---
+
+## Katkıda Bulunma
+
+1. Projeyi fork edin
+2. Feature branch oluşturun (`git checkout -b feature/yeni-ozellik`)
+3. Değişikliklerinizi commit edin (`git commit -m 'feat: yeni özellik ekle'`)
+4. Branch'inizi push edin (`git push origin feature/yeni-ozellik`)
+5. Pull Request açın
+
+---
+
+## Lisans
+
+Apache License 2.0 ile dağıtılmaktadır. Detaylar için `LICENSE` dosyasına bakın.
+
+---
+
+## İletişim
+
+Murat Demirci — [@deusmur](https://twitter.com/deusmur) — deusmur@protonmail.com
+
+Proje: [https://github.com/muratdemirci/docwiz](https://github.com/muratdemirci/docwiz)
+
+<p align="right">(<a href="#top">yukarı dön</a>)</p>

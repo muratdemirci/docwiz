@@ -1,40 +1,51 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Text, useTheme } from '@geist-ui/react'
 
 import UploadFiles from '../components/Upload'
 import DocumentGenerator from '../components/DocumentGenerator'
+import { parseCollection } from '../utils/postmanParser'
 
 const QuickStart = () => {
   const { palette } = useTheme()
-  const [inProgress, setInProgress] = useState(false)
-  const [treeData, setTreeData] = useState([])
+  const [collection, setCollection] = useState(null)
 
-  useEffect(() => {
-    setInProgress((prevCheck) => !prevCheck)
-  }, [])
-
-  const childCompRef = useRef(null)
-  useLayoutEffect(() => {
-    // console.log(childCompRef)
-  }, [])
-
-  const eventhandler = (data) => {
-    const eventStatus = data
-    if (eventStatus.progressFinish) {
-      setInProgress((prevCheck) => !prevCheck)
-      setTreeData(eventStatus)
+  const handleFileLoaded = useCallback((rawData) => {
+    const { error, collection: parsed } = parseCollection(rawData)
+    if (error) {
+      console.error('Parse error:', error)
+      return
     }
-  }
+    setCollection(parsed)
+  }, [])
+
+  const handleReset = useCallback(() => {
+    setCollection(null)
+  }, [])
 
   return (
     <div className="condiv">
       <Text h1 style={{ color: palette.violet }}>
         Hızlı Başlangıç
       </Text>
-      {inProgress ? (
-        <UploadFiles ref={childCompRef} onChange={eventhandler} />
+      {!collection ? (
+        <UploadFiles onFileLoaded={handleFileLoaded} />
       ) : (
-        <DocumentGenerator data={treeData} />
+        <>
+          <div style={{ marginBottom: 16 }}>
+            <Text
+              span
+              style={{
+                color: palette.violet,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+              }}
+              onClick={handleReset}
+            >
+              Yeni dosya yükle
+            </Text>
+          </div>
+          <DocumentGenerator collection={collection} />
+        </>
       )}
     </div>
   )

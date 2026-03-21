@@ -1,0 +1,352 @@
+{
+  "info": {
+    "_postman_id": "test-collection-001",
+    "name": "Task Manager API",
+    "description": "A simple Task Manager REST API for managing tasks and users. Supports CRUD operations with authentication.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securePass123\"\n}"
+            },
+            "url": {
+              "raw": "https://api.taskmanager.com/auth/register",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account. Returns a JWT token on success."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 1,\n  \"username\": \"john_doe\",\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securePass123\"\n}"
+            },
+            "url": {
+              "raw": "https://api.taskmanager.com/auth/login",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate a user and receive a JWT token."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n  \"expiresIn\": 3600\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "https://api.taskmanager.com/tasks?status=active&page=1&limit=10",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by task status (active, completed, archived)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Retrieve all tasks for the authenticated user. Supports filtering by status and pagination."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"tasks\": [\n    {\n      \"id\": 1,\n      \"title\": \"Buy groceries\",\n      \"status\": \"active\",\n      \"priority\": \"medium\"\n    }\n  ],\n  \"total\": 25,\n  \"page\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buy groceries\",\n  \"description\": \"Get milk, eggs, and bread\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2026-04-01\"\n}"
+            },
+            "url": {
+              "raw": "https://api.taskmanager.com/tasks",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["tasks"]
+            },
+            "description": "Create a new task for the authenticated user."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 2,\n  \"title\": \"Buy groceries\",\n  \"status\": \"active\",\n  \"createdAt\": \"2026-03-21T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "https://api.taskmanager.com/tasks/1",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["tasks", "1"]
+            },
+            "description": "Get a specific task by its ID."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 1,\n  \"title\": \"Buy groceries\",\n  \"description\": \"Get milk, eggs, and bread\",\n  \"status\": \"active\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2026-04-01\",\n  \"createdAt\": \"2026-03-21T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buy groceries (updated)\",\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "https://api.taskmanager.com/tasks/1",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["tasks", "1"]
+            },
+            "description": "Update an existing task by its ID. Supports partial updates."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 1,\n  \"title\": \"Buy groceries (updated)\",\n  \"status\": \"completed\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "https://api.taskmanager.com/tasks/1",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["tasks", "1"]
+            },
+            "description": "Delete a task by its ID. This action is irreversible."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "https://api.taskmanager.com/users/me",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["users", "me"]
+            },
+            "description": "Get the profile of the currently authenticated user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 1,\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"createdAt\": \"2026-01-15T08:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_updated\",\n  \"email\": \"john_new@example.com\"\n}"
+            },
+            "url": {
+              "raw": "https://api.taskmanager.com/users/me",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["users", "me"]
+            },
+            "description": "Update the profile of the currently authenticated user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 1,\n  \"username\": \"john_updated\",\n  \"email\": \"john_new@example.com\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "https://api.taskmanager.com/users/me",
+              "protocol": "https",
+              "host": ["api", "taskmanager", "com"],
+              "path": ["users", "me"]
+            },
+            "description": "Permanently delete the authenticated user's account and all associated data."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

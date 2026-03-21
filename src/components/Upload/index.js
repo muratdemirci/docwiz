@@ -1,121 +1,101 @@
-import React, { Component } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import Dropzone from 'react-dropzone'
-import { FakeLoading } from './fakeloader'
-
-// import UploadService from "../../services/upload-files";
+import { Loading, Note } from '@geist-ui/react'
+import { validateCollection } from '../../utils/postmanParser'
 
 import './style.css'
 
-export default class UploadFiles extends Component {
-  constructor(props) {
-    super(props)
-    this.onDrop = this.onDrop.bind(this)
+const UploadFiles = ({ onFileLoaded }) => {
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const timerRef = useRef(null)
 
-    this.state = {
-      selectedFiles: undefined,
-      progressInfo: false,
-      progressFinish: false,
-      // timeToLeave: Math.floor(Math.random() * 11),
-      timeToLeave: 1,
-      fileInfos: [],
-      fileData: [],
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }
+  }, [])
 
-  componentDidMount() {
-    // UploadService.getFiles().then((response) => {
-    //   this.setState({
-    //     fileInfos: response.data,
-    //   });
-    // });
-  }
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      setError(null)
 
-  componentDidUpdate() {
-    if (this.props.onChange) {
-      this.props.onChange(this.state)
-    }
-  }
+      if (acceptedFiles.length === 0) return
 
-  onDrop(files) {
-    if (files.length > 0) {
-      this.setState({ selectedFiles: files, progressInfo: true })
-    } else {
-      this.setState({ progressInfo: false })
-    }
+      const file = acceptedFiles[0]
 
-    let jsonOutput
+      if (!file.name.endsWith('.json')) {
+        setError('Lütfen bir JSON dosyası yükleyin.')
+        return
+      }
 
-    for (let i = 0, f; (f = files[i]); i++) {
-      let reader = new FileReader()
+      setSelectedFile(file)
+      setIsLoading(true)
 
-      reader.onload = (function (theFile) {
-        return function (e) {
-          try {
-            jsonOutput = JSON.parse(e.target.result)
-            // TODO: add toast
-            // console.log('dosya başarıyla yüklendi')
-          } catch (error) {
-            console.error(
-              `hiçbir şey olmasa bile kesin bir şeyler oldu ${error}`
-            )
+      const reader = new FileReader()
+
+      reader.onload = (e) => {
+        try {
+          const jsonData = JSON.parse(e.target.result)
+          const validation = validateCollection(jsonData)
+
+          if (!validation.valid) {
+            setError(validation.error)
+            setIsLoading(false)
+            return
           }
+
+          timerRef.current = setTimeout(() => {
+            setIsLoading(false)
+            onFileLoaded(jsonData)
+          }, 800)
+        } catch (parseError) {
+          setError('JSON dosyası okunamadı. Lütfen geçerli bir dosya yükleyin.')
+          setIsLoading(false)
         }
-      })(f)
-      reader.readAsText(f)
-    }
+      }
 
-    // HEY MR WIZARD, GET ME OUT OF HERE!
-    // WIZARD: You should stand there and look at the console.
-    setTimeout(() => {
-      // console.log(jsonOutput);
-      this.setState({ progressFinish: true, fileData: jsonOutput })
-      // this.setState({ fileData: jsonOutput });
-    }, this.state.timeToLeave * 1000)
-  }
+      reader.onerror = () => {
+        setError('Dosya okuma hatası oluştu.')
+        setIsLoading(false)
+      }
 
-  render() {
-    const { selectedFiles, progressInfo, fileInfos } = this.state
+      reader.readAsText(file)
+    },
+    [onFileLoaded]
+  )
 
-    return (
-      <div>
-        {progressInfo && <FakeLoading ttl={this.state.timeToLeave} />}
-        <div className="my-3">
-          <Dropzone onDrop={this.onDrop}>
-            {({ getRootProps, getInputProps }) => (
-              <section>
-                <div {...getRootProps({ className: 'dropzone' })}>
-                  <input {...getInputProps()} />
-                  {selectedFiles &&
-                  Array.isArray(selectedFiles) &&
-                  selectedFiles.length ? (
-                    <div className="selected-file">
-                      {selectedFiles.length > 3
-                        ? `${selectedFiles.length} files`
-                        : selectedFiles.map((file) => file.name).join(', ')}
-                    </div>
-                  ) : (
-                    'Postman Json dosya çıktınızı sürükleyip bırakabilirsiniz ya da  buraya tıklayıp seçebilirsiniz'
-                  )}
-                </div>
-              </section>
-            )}
-          </Dropzone>
-        </div>
+  return (
+    <div>
+      {error && (
+        <Note type="error" label="Hata" style={{ marginBottom: 16 }}>
+          {error}
+        </Note>
+      )}
 
-        {fileInfos.length > 0 && (
-          <div className="card">
-            <div className="card-header">List of Files</div>
-            <ul className="list-group list-group-flush">
-              {fileInfos &&
-                fileInfos.map((file, index) => (
-                  <li className="list-group-item" key={index}>
-                    <a href={file.url}>{file.name}</a>
-                  </li>
-                ))}
-            </ul>
-          </div>
+      {isLoading && <Loading>Dosya yükleniyor</Loading>}
+
+      <Dropzone onDrop={onDrop} accept="application/json" multiple={false}>
+        {({ getRootProps, getInputProps, isDragActive }) => (
+          <section>
+            <div
+              {...getRootProps({
+                className: `dropzone ${isDragActive ? 'dropzone-active' : ''}`,
+              })}
+            >
+              <input {...getInputProps()} data-testid="file-input" />
+              {selectedFile ? (
+                <div className="selected-file">{selectedFile.name}</div>
+              ) : (
+                'Postman JSON dosya çıktınızı sürükleyip bırakabilirsiniz ya da buraya tıklayıp seçebilirsiniz'
+              )}
+            </div>
+          </section>
         )}
-      </div>
-    )
-  }
+      </Dropzone>
+    </div>
+  )
 }
+
+export default UploadFiles
