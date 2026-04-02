@@ -9,66 +9,66 @@
   <h3 align="center">DocWiz — Documentation Wizard</h3>
 
   <p align="center">
-    Postman collection JSON dosyalarını import edin, endpoint'leri görüntüleyin ve tek tıkla README oluşturun.
+    Import Postman collection JSON files, browse endpoints, and generate a README with a single click.
     <br />
-    <strong>Frontend-only</strong> — backend gerektirmez, tüm işlemler tarayıcıda yapılır.
+    <strong>Frontend-only</strong> — no backend required, everything runs in the browser.
   </p>
 </div>
 
 ---
 
-## İçindekiler
+## Table of Contents
 
-- [Hakkında](#hakkında)
-- [Uygulama Akışı](#uygulama-akışı)
-- [Mimari](#mimari)
-- [Teknolojiler](#teknolojiler)
-- [Kurulum](#kurulum)
-- [Kullanım](#kullanım)
-- [Proje Yapısı](#proje-yapısı)
-- [Test](#test)
-- [Yol Haritası](#yol-haritası)
-- [Katkıda Bulunma](#katkıda-bulunma)
-- [Lisans](#lisans)
-- [İletişim](#iletişim)
-
----
-
-## Hakkında
-
-<img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/docwiz-reklam.jpg" alt="DocWiz Tanıtım" title="DocWiz">
-
-DocWiz, REST API'lerinizin **Postman v2.1 collection export** dosyalarını alıp:
-
-- Endpoint'leri ağaç yapısında görüntüler
-- Seçilen endpoint'in tüm detaylarını gösterir (method, URL, headers, query params, body, responses)
-- Tek tıkla o endpoint için **Markdown README** oluşturur ve indirir
-- Tüm collection için README önizleme ve indirme sunar
-
-Hiçbir backend veya API çağrısı gerektirmez — **tamamen tarayıcıda** çalışır.
+- [About](#about)
+- [Application Flow](#application-flow)
+- [Architecture](#architecture)
+- [Technologies](#technologies)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 ---
 
-## Uygulama Akışı
+## About
+
+<img src="https://raw.githubusercontent.com/muratdemirci/docwiz/main/images/docwiz-reklam.jpg" alt="DocWiz Showcase" title="DocWiz">
+
+DocWiz takes your **Postman v2.1 collection export** files and:
+
+- Displays endpoints in a tree view
+- Shows full details of the selected endpoint (method, URL, headers, query params, body, responses)
+- Generates and downloads a **Markdown README** for that endpoint with a single click
+- Offers README preview and download for the entire collection
+
+No backend or API calls required — runs **entirely in the browser**.
+
+---
+
+## Application Flow
 
 ```mermaid
 flowchart LR
-    A[Postman JSON\nDosyası] -->|Sürükle & Bırak| B[Upload\nKomponenti]
-    B -->|Validasyon &\nParse| C{Geçerli mi?}
-    C -->|Hayır| D[Hata Mesajı]
-    C -->|Evet| E[Ağaç Görünümü\n+ README Önizleme]
-    E -->|Endpoint Tıkla| F[Endpoint Detayı]
-    F -->|README Oluştur| G[Markdown\nOluştur & İndir]
-    E -->|README İndir| H[Tüm Collection\nREADME İndir]
+    A[Postman JSON\nFile] -->|Drag & Drop| B[Upload\nComponent]
+    B -->|Validation &\nParse| C{Valid?}
+    C -->|No| D[Error Message]
+    C -->|Yes| E[Tree View\n+ README Preview]
+    E -->|Click Endpoint| F[Endpoint Detail]
+    F -->|Generate README| G[Generate &\nDownload Markdown]
+    E -->|Download README| H[Download Full\nCollection README]
 ```
 
 ---
 
-## Mimari
+## Architecture
 
 ```mermaid
 graph TD
-    subgraph UI["UI Katmanı (React + Geist UI)"]
+    subgraph UI["UI Layer (React + Geist UI)"]
         App[App.js]
         Nav[Navbar]
         QS[QuickStart]
@@ -80,7 +80,7 @@ graph TD
         RP[ReadmePanel]
     end
 
-    subgraph Utils["Utility Katmanı"]
+    subgraph Utils["Utility Layer"]
         PP[postmanParser.js]
         RG[readmeGenerator.js]
         FJ[formatJson.js]
@@ -98,7 +98,7 @@ graph TD
     DG --> RP
     TV --> PP
     ED --> FJ
-    ED -->|README Oluştur| RG
+    ED -->|Generate README| RG
     RP --> RG
     RP --> SN
 
@@ -106,173 +106,173 @@ graph TD
     style Utils fill:#f0f9ff,stroke:#0070f3
 ```
 
-### Temel Prensipler
+### Core Principles
 
-| Prensip | Uygulama |
-|---------|----------|
-| **Single Responsibility** | Her utility tek iş yapar: `postmanParser` parse eder, `readmeGenerator` markdown üretir, `sanitize` XSS temizler |
-| **DRY** | `formatJson`, `KeyValueTable`, `generateTable` gibi paylaşılan modüller tekrarı önler |
-| **Güvenlik** | `DOMPurify` ile HTML sanitization — kullanıcı dosyasından gelen veri asla raw render edilmez |
-| **Frontend-Only** | Sıfır backend bağımlılığı, tüm işlem tarayıcıda |
+| Principle | Implementation |
+|-----------|----------------|
+| **Single Responsibility** | Each utility does one thing: `postmanParser` parses, `readmeGenerator` produces markdown, `sanitize` cleans XSS |
+| **DRY** | Shared modules like `formatJson`, `KeyValueTable`, `generateTable` prevent duplication |
+| **Security** | HTML sanitization with `DOMPurify` — user file data is never rendered raw |
+| **Frontend-Only** | Zero backend dependencies, all processing happens in the browser |
 
 ---
 
-## Teknolojiler
+## Technologies
 
-| Teknoloji | Versiyon | Kullanım |
-|-----------|----------|----------|
+| Technology | Version | Purpose |
+|------------|---------|---------|
 | [React](https://reactjs.org/) | 17.x | UI framework |
-| [Geist UI](https://react.geist-ui.dev/) | 2.x | Component kütüphanesi |
+| [Geist UI](https://react.geist-ui.dev/) | 2.x | Component library |
 | [React Router](https://reactrouter.com/) | 6.x | Client-side routing |
-| [react-dropzone](https://react-dropzone.js.org/) | 11.x | Dosya sürükle & bırak |
-| [DOMPurify](https://github.com/cure53/DOMPurify) | 3.x | XSS koruması |
-| [Testing Library](https://testing-library.com/) | — | Test altyapısı |
+| [react-dropzone](https://react-dropzone.js.org/) | 11.x | File drag & drop |
+| [DOMPurify](https://github.com/cure53/DOMPurify) | 3.x | XSS protection |
+| [Testing Library](https://testing-library.com/) | — | Testing infrastructure |
 
 ---
 
-## Kurulum
+## Getting Started
 
 ```bash
-# Repoyu klonlayın
+# Clone the repository
 git clone https://github.com/muratdemirci/docwiz.git
 cd docwiz
 
-# Bağımlılıkları yükleyin
+# Install dependencies
 npm install
 
-# Geliştirme sunucusunu başlatın
+# Start the development server
 npm start
 ```
 
-Uygulama varsayılan olarak `http://localhost:3000` adresinde açılır.
+The app opens at `http://localhost:3000` by default.
 
 ---
 
-## Kullanım
+## Usage
 
 ```mermaid
 sequenceDiagram
-    actor K as Kullanıcı
-    participant U as Upload
+    actor U as User
+    participant Up as Upload
     participant P as Parser
     participant T as TreeViewer
     participant E as EndpointDetail
     participant R as ReadmeGenerator
 
-    K->>U: JSON dosyasını sürükle & bırak
-    U->>P: JSON parse & validasyon
-    P-->>U: Parsed collection
-    U->>T: Ağaç görünümünü render et
-    K->>T: Endpoint'e tıkla
-    T->>E: Endpoint detayını göster
-    K->>E: "README Oluştur" butonuna tıkla
-    E->>R: Endpoint verisiyle markdown oluştur
-    R-->>K: README.md dosyası indirilir
+    U->>Up: Drag & drop JSON file
+    Up->>P: Parse & validate JSON
+    P-->>Up: Parsed collection
+    Up->>T: Render tree view
+    U->>T: Click an endpoint
+    T->>E: Show endpoint details
+    U->>E: Click "Generate README"
+    E->>R: Generate markdown from endpoint data
+    R-->>U: README.md file downloaded
 ```
 
-1. **"Hızlı Başlangıç"** sekmesine gidin
-2. Postman collection JSON dosyanızı **sürükleyip bırakın** veya tıklayıp seçin
-3. Sol panelde **ağaç görünümünden** bir endpoint'e tıklayın
-4. Sağ panelde endpoint detaylarını inceleyin
-5. **"README Oluştur"** butonuna tıklayarak o endpoint'in README'sini indirin
-6. Veya hiç endpoint seçmeden **"README İndir"** ile tüm collection README'sini indirin
+1. Go to the **"Quick Start"** tab
+2. **Drag and drop** your Postman collection JSON file or click to select
+3. Click an endpoint from the **tree view** in the left panel
+4. Review the endpoint details in the right panel
+5. Click **"Generate README"** to download the README for that endpoint
+6. Or click **"Download README"** without selecting any endpoint to download the full collection README
 
-> **İpucu:** Proje içinde örnek bir Postman collection dosyası bulunmaktadır: `src/test-data/sample-collection.json`
+> **Tip:** A sample Postman collection file is included in the project: `src/test-data/sample-collection.json`
 
 ---
 
-## Proje Yapısı
+## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Navbar/                  # Navigasyon (functional, route-based active state)
-│   ├── Upload/                  # Dosya yükleme (dropzone + validasyon)
+│   ├── Navbar/                  # Navigation (functional, route-based active state)
+│   ├── Upload/                  # File upload (dropzone + validation)
 │   └── DocumentGenerator/
-│       ├── TreeViewer/          # Postman collection ağaç görünümü
-│       ├── EndpointDetail/      # Seçili endpoint detay paneli
-│       └── ReadmePanel/         # README önizleme + indirme
+│       ├── TreeViewer/          # Postman collection tree view
+│       ├── EndpointDetail/      # Selected endpoint detail panel
+│       └── ReadmePanel/         # README preview + download
 ├── contents/
-│   ├── HowItWorks.js           # Bilgilendirme sayfası
-│   ├── QuickStart.js           # Ana uygulama sayfası
-│   └── NotFoundPage.js         # 404 sayfası
+│   ├── HowItWorks.js           # Information page
+│   ├── QuickStart.js           # Main application page
+│   └── NotFoundPage.js         # 404 page
 ├── utils/
 │   ├── postmanParser.js        # Postman v2.1 collection parser
-│   ├── readmeGenerator.js      # Markdown README üretici
-│   ├── formatJson.js           # JSON formatlama utility
+│   ├── readmeGenerator.js      # Markdown README generator
+│   ├── formatJson.js           # JSON formatting utility
 │   └── sanitize.js             # DOMPurify HTML sanitization
 └── test-data/
-    └── sample-collection.json  # Test için örnek Postman collection
+    └── sample-collection.json  # Sample Postman collection for testing
 ```
 
 ---
 
-## Test
+## Testing
 
 ```bash
-# Tüm testleri çalıştır
+# Run all tests
 npm test
 
-# Verbose çıktı ile
+# With verbose output
 npx react-scripts test --watchAll=false --verbose
 ```
 
 ```mermaid
-pie title Test Dağılımı (85 test)
-    "Parser Testleri" : 38
-    "README Generator Testleri" : 17
-    "Sanitize Testleri" : 8
-    "Format JSON Testleri" : 5
-    "Integration Testleri" : 15
-    "App Testleri" : 2
+pie title Test Distribution (85 tests)
+    "Parser Tests" : 38
+    "README Generator Tests" : 17
+    "Sanitize Tests" : 8
+    "Format JSON Tests" : 5
+    "Integration Tests" : 15
+    "App Tests" : 2
 ```
 
-| Test Suite | Kapsam |
-|------------|--------|
-| `postmanParser.test.js` | Validasyon, parse, flatten, edge case'ler |
-| `readmeGenerator.test.js` | Markdown üretimi, TOC, tablo, download |
-| `sanitize.test.js` | XSS koruması, script/iframe/event handler temizleme |
-| `formatJson.test.js` | JSON formatlama, geçersiz input handling |
-| `integration.test.js` | Upload akışı, Navbar, DocumentGenerator, E2E flow |
+| Test Suite | Coverage |
+|------------|----------|
+| `postmanParser.test.js` | Validation, parsing, flattening, edge cases |
+| `readmeGenerator.test.js` | Markdown generation, TOC, tables, download |
+| `sanitize.test.js` | XSS protection, script/iframe/event handler removal |
+| `formatJson.test.js` | JSON formatting, invalid input handling |
+| `integration.test.js` | Upload flow, Navbar, DocumentGenerator, E2E flow |
 
 ---
 
-## Yol Haritası
+## Roadmap
 
 - [x] Postman v2.1 collection import & parse
-- [x] Ağaç görünümünde endpoint listesi
-- [x] Endpoint detay görüntüleme (method, URL, headers, body, responses)
-- [x] Tek endpoint için README oluşturma & indirme
-- [x] Tüm collection için README önizleme & indirme
-- [x] DOMPurify ile XSS koruması
-- [x] 85 test ile kapsamlı test coverage
-- [ ] Birden fazla endpoint seçerek toplu README oluşturma
-- [ ] README şablon özelleştirme
-- [ ] Postman v2.0 collection desteği
+- [x] Endpoint listing in tree view
+- [x] Endpoint detail view (method, URL, headers, body, responses)
+- [x] Single endpoint README generation & download
+- [x] Full collection README preview & download
+- [x] XSS protection with DOMPurify
+- [x] Comprehensive test coverage with 85 tests
+- [ ] Bulk README generation by selecting multiple endpoints
+- [ ] README template customization
+- [ ] Postman v2.0 collection support
 - [ ] Dark mode
 
 ---
 
-## Katkıda Bulunma
+## Contributing
 
-1. Projeyi fork edin
-2. Feature branch oluşturun (`git checkout -b feature/yeni-ozellik`)
-3. Değişikliklerinizi commit edin (`git commit -m 'feat: yeni özellik ekle'`)
-4. Branch'inizi push edin (`git push origin feature/yeni-ozellik`)
-5. Pull Request açın
-
----
-
-## Lisans
-
-Apache License 2.0 ile dağıtılmaktadır. Detaylar için `LICENSE` dosyasına bakın.
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'feat: add new feature'`)
+4. Push your branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
 
 ---
 
-## İletişim
+## License
+
+Distributed under the Apache License 2.0. See `LICENSE` for details.
+
+---
+
+## Contact
 
 Murat Demirci — [@deusmur](https://twitter.com/deusmur) — deusmur@protonmail.com
 
-Proje: [https://github.com/muratdemirci/docwiz](https://github.com/muratdemirci/docwiz)
+Project: [https://github.com/muratdemirci/docwiz](https://github.com/muratdemirci/docwiz)
 
-<p align="right">(<a href="#top">yukarı dön</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p>
